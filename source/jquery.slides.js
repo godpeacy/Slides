@@ -16,6 +16,12 @@
         active: true,
         effect: "slide"
       },
+      external_pagination: {
+        active: true,
+        control: '',
+        item: 'div',
+        current: ''
+      },
       play: {
         active: false,
         effect: "slide",
@@ -54,7 +60,7 @@
 
     })();
     Plugin.prototype.init = function() {
-      var $element, nextButton, pagination, playButton, prevButton, stopButton,
+      var $element, nextButton, pagination, external_pagination, playButton, prevButton, stopButton,
         _this = this;
       $element = $(this.element);
       this.data = $.data(this);
@@ -185,6 +191,19 @@
           });
         });
       }
+      if (this.options.external_pagination.active) {
+        external_pagination = $(this.options.external_pagination.control);
+        external_pagination.addClass('slidesjs-pagination')
+        .appendTo($element)
+        .children()
+        .each(function(i) {
+            $(this).attr("data-slidesjs-item", i).addClass('a' + i);
+            return $(this).click(function(e) {
+                e.preventDefault();
+                return _this.goto(($(e.currentTarget).attr("data-slidesjs-item") * 1) + 1);
+            })
+        });
+      }
       $(window).bind("resize", function() {
         return _this.update();
       });
@@ -199,8 +218,13 @@
       $element = $(this.element);
       this.data = $.data(this);
       current = number > -1 ? number : this.data.current;
+      if (this.options.external_pagination.active) {
+      $('.'+this.options.external_pagination.current, $element).removeClass(this.options.external_pagination.current);
+          return $(".slidesjs-pagination "+this.options.external_pagination.item+":eq(" + current + ")", $element).addClass(this.options.external_pagination.current);
+      } else {
       $(".active", $element).removeClass("active");
-      return $(".slidesjs-pagination li:eq(" + current + ") a", $element).addClass("active");
+          return $(".slidesjs-pagination li:eq(" + current + ") a", $element).addClass("active");
+      }
     };
     Plugin.prototype.update = function() {
       var $element, height, width;
